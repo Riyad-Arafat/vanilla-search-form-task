@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./index.css" />
+    <script src="./index.js" defer></script>
+    <script src="./modal.js" defer></script>
+    <title>vanilla-search-form-task</title>
+  </head>
+  <body>
+    <form id="search-form">
+      <h1>Search Form</h1>
+      <div class="form-control" style="width: 100%">
+        <label for="destination">Destination:</label>
+        <input
+          type="text"
+          id="destination"
+          name="destination"
+          autocomplete="off"
+          placeholder="Type a destination name"
+          required
+        />
+        <ul id="destination-list" class="autocomplete-list hidden"></ul>
+      </div>
+
+      <div class="form-control">
+        <label for="check-in-date">Check-in date:</label>
+        <input type="date" id="check-in-date" name="check-in-date" required />
+      </div>
+
+      <div class="form-control">
+        <label for="check-out-date">Check-out date:</label>
+        <input type="date" id="check-out-date" name="check-out-date" required />
+      </div>
+      <div class="form-control">
+        <label for="nights">Number of nights:</label>
+        <input
+          type="number"
+          id="nights"
+          name="nights"
+          required
+          min="1"
+          placeholder="Enter number of nights"
+        />
+      </div>
+      <div class="form-control">
+        <label for="nationality">Nationality:</label>
+        <input
+          type="text"
+          id="nationality"
+          name="nationality"
+          autocomplete="off"
+          required
+          placeholder="Type the Nationality"
+        />
+        <ul id="nationality-list" class="autocomplete-list hidden"></ul>
+      </div>
+
+      <div class="form-control" style="width: 100%">
+        <a id="modal-btn" type="button">More Options</a>
+
+        <button type="submit">Search</button>
+      </div>
+    </form>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>More Search Options</h2>
+        <div class="modal-body">
+          <div class="form-control">
+            <label for="currency">Currency:</label>
+            <select id="currency" name="currency">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+              <option value="JPY">JPY</option>
+            </select>
+          </div>
+          <div class="form-control">
+            <label for="country">Country:</label>
+            <input
+              type="text"
+              id="country"
+              name="country"
+              autocomplete="off"
+              placeholder="Type a country name"
+            />
+            <ul id="country-list" class="autocomplete-list hidden"></ul>
+          </div>
+          <div class="form-control">
+            <label for="city">City:</label>
+            <input
+              type="text"
+              id="city"
+              name="city"
+              autocomplete="off"
+              placeholder="Type a city name"
+            />
+            <ul id="city-list" class="autocomplete-list hidden"></ul>
+          </div>
+        </div>
+        <button id="modal-done-btn" type="submit">Done</button>
+      </div>
+    </div>
+  </body>
+</html>
