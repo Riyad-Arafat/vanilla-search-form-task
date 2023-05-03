@@ -9,10 +9,6 @@ body {
   flex-direction: column;
 }
 
-.hidden {
-  display: none;
-}
-
 form {
   border: 3px solid #f1f1f1;
   width: 50%;
@@ -60,6 +56,7 @@ button[type="submit"] {
 }
 
 .autocomplete-list {
+  display: none;
   position: absolute;
   width: 80%;
   z-index: 1;

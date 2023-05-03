@@ -1,32 +1,34 @@
+import $ from "./jquery.module.js";
+
 // Get the modal
-var modal = document.getElementById("modal");
+var modal = $("#modal");
 
 // Get the button that opens the modal
-var btn = document.getElementById("modal-btn");
+var btn = $("#modal-btn");
 
 // Get the done button
-var doneBtn = document.getElementById("modal-done-btn");
+var doneBtn = $("#modal-done-btn");
 
 // Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+var span = $(".close:first");
 
 // When the user clicks the button, open the modal
-btn.onclick = function () {
-  modal.style.display = "flex";
-};
+btn.click(function () {
+  modal.css("display", "flex");
+});
 
 // When the user clicks on <span> (x), close the modal
-span.onclick = function () {
-  modal.style.display = "none";
-};
+span.click(function () {
+  modal.css("display", "none");
+});
 
-doneBtn.onclick = function () {
-  modal.style.display = "none";
-};
+doneBtn.click(function () {
+  modal.css("display", "none");
+});
 
 // When the user clicks anywhere outside of the modal, close it
-window.onclick = function (event) {
-  if (event.target === modal) {
-    modal.style.display = "none";
+$(window).click(function (event) {
+  if (event.target === modal[0]) {
+    modal.css("display", "none");
   }
-};
+});

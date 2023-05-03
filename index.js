@@ -1,15 +1,17 @@
+import $ from "./jquery.module.js";
+
 // Get the input and list elements
-const destinationInput = document.getElementById("destination");
-const nationalityInput = document.getElementById("nationality");
-const countryInput = document.getElementById("country");
-const cityInput = document.getElementById("city");
-const checkInInput = document.getElementById("check-in-date");
-const checkOutInput = document.getElementById("check-out-date");
-const nightsInput = document.getElementById("nights");
-const countryList = document.getElementById("country-list");
-const cityList = document.getElementById("city-list");
-const destinationList = document.getElementById("destination-list");
-const nationalityList = document.getElementById("nationality-list");
+const destinationInput = $("#destination");
+const nationalityInput = $("#nationality");
+const countryInput = $("#country");
+const cityInput = $("#city");
+const checkInInput = $("#check-in-date");
+const checkOutInput = $("#check-out-date");
+const nightsInput = $("#nights");
+const countryList = $("#country-list");
+const cityList = $("#city-list");
+const destinationList = $("#destination-list");
+const nationalityList = $("#nationality-list");
 
 // destinations mock array
 const destinations = [
@@ -58,33 +60,28 @@ const destinations_data = destinations.map((destination) => ({
 
 function search(element, input, data, type = "destination") {
   function showListBody() {
-    if (element.classList.contains("hidden")) {
-      element.classList.remove("hidden");
-    }
+    $(element).show();
   }
 
   function hideListBody() {
-    if (!element.classList.contains("hidden")) {
-      element.classList.add("hidden");
-    }
+    $(element).hide();
   }
 
-  var value = this.value;
-  element.innerHTML = "";
+  var value = input.val();
+  element.html("");
   let hasMatch = false;
   if (value.length > 0) {
     data.forEach(function ({ label, value: item_value }) {
       if (!item_value) return;
       if (item_value.toLowerCase().indexOf(value.toLowerCase()) === 0) {
-        var li = document.createElement("li");
-        li.innerHTML = label;
-        li.addEventListener("click", function () {
-          if (type !== "destination") input.value = label;
-          else input.value = item_value;
-          element.innerHTML = "";
+        var li = $("<li>").html(label);
+        li.on("click", function () {
+          if (type !== "destination") input.val(label);
+          else input.val(item_value);
+          // $(element).html("");
           hideListBody();
         });
-        element.appendChild(li);
+        element.append(li);
         hasMatch = true;
       }
     });
@@ -95,107 +92,114 @@ function search(element, input, data, type = "destination") {
 // function to disable dates before today in the check-in and check-out
 function disableDatesBeforeToday() {
   const today = new Date().toISOString().slice(0, 10);
-  checkInInput.setAttribute("min", today);
-  checkOutInput.setAttribute("min", today);
+  $(checkInInput).attr("min", today);
+  $(checkOutInput).attr("min", today);
 }
 
 // function to disable dates before the check-in date in the check-out
 function disableDatesBeforeCheckIn() {
-  checkOutInput.setAttribute("min", checkInInput.value);
+  $(checkOutInput).attr("min", $(checkInInput).val());
 }
 
 function calculateNights(event) {
-  const checkInDate = !checkInInput.value
+  const checkInDate = !$(checkInInput).val()
     ? new Date()
-    : new Date(checkInInput.value);
-  const checkOutDate = !checkOutInput.value
+    : new Date($(checkInInput).val());
+  const checkOutDate = !$(checkOutInput).val()
     ? new Date(checkInDate.getTime() + 1000 * 60 * 60 * 24)
-    : new Date(checkOutInput.value);
+    : new Date($(checkOutInput).val());
   const currentNight = (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24);
   let nights = Math.max(currentNight, 1);
   // if the event is "night", update the nights to match the value of the input
   if (event === "night") {
-    nights = nightsInput.value;
+    nights = $(nightsInput).val();
   }
   // update the value of the nights input
-  nightsInput.value = nights;
+  $(nightsInput).val(nights);
   // update check-out value based on nights
   if (nights > 0) {
     const newCheckOutDate = new Date(
       checkInDate.getTime() + nights * (1000 * 60 * 60 * 24)
     );
-    checkOutInput.value = newCheckOutDate.toISOString().slice(0, 10);
-    checkInInput.value = checkInDate.toISOString().slice(0, 10);
+    $(checkOutInput).val(newCheckOutDate.toISOString().slice(0, 10));
+    $(checkInInput).val(checkInDate.toISOString().slice(0, 10));
   }
 }
 
 // Call the functions to disable dates before today
 disableDatesBeforeToday();
 
-// Add event listeners to check-in  inputs
-checkInInput.addEventListener("input", function () {
+// Add event listeners to check-in inputs
+$(checkInInput).on("input", function () {
   calculateNights();
   disableDatesBeforeCheckIn();
 });
+
 // Add event listeners to check-out inputs
-checkOutInput.addEventListener("input", function () {
+$(checkOutInput).on("input", function () {
   calculateNights();
 });
 
 // Add event listeners to nights input
-nightsInput.addEventListener("input", function () {
+$(nightsInput).on("input", function () {
   calculateNights("night");
 });
 
 //////////////////////////// AutoComplete ////////////////////////////
-let nationalities = null;
+var has_fetched_countries = false;
+var nationalities = [];
+var countries = [];
 async function fetchCountries() {
   try {
     const response = await fetch("https://restcountries.com/v3.1/all");
     const data = await response.json();
-    return data;
+    has_fetched_countries = true;
+    countries = data.map((country) => ({
+      label: `${country.flag} ${country.name.common}`,
+      value: country.name.common,
+    }));
+    nationalities = data.map((country) => ({
+      label: `${country.flag} ${country.demonyms?.eng.m}`,
+      value: country.demonyms?.eng.m,
+    }));
   } catch (error) {
     console.error(error);
   }
 }
 
 // Hide the list when the user clicks outside of it
-document.addEventListener("click", function (event) {
+$(document).on("click", function (event) {
   const destination_condition =
-    event.target !== destinationInput && event.target !== destinationList;
+    event.target !== destinationInput[0] && event.target !== destinationList[0];
   const nationality_condition =
-    event.target !== nationalityInput && event.target !== nationalityList;
+    event.target !== nationalityInput[0] && event.target !== nationalityList[0];
 
   const country_condition =
-    event.target !== countryInput && event.target !== countryList;
+    event.target !== countryInput[0] && event.target !== countryList[0];
 
   const city_condition =
-    event.target !== cityInput && event.target !== cityList;
+    event.target !== cityInput[0] && event.target !== cityList[0];
 
-  if (destination_condition) destinationList.innerHTML = "";
+  if (destination_condition) $(destinationList).hide();
 
-  if (nationality_condition) nationalityList.innerHTML = "";
+  if (nationality_condition) $(nationalityList).hide();
 
-  if (country_condition) countryList.innerHTML = "";
+  if (country_condition) $(countryList).hide();
 
-  if (city_condition) cityList.innerHTML = "";
+  if (city_condition) $(cityList).hide();
 });
 
 // Add an event listener to destination input
-destinationInput.addEventListener("input", function () {
+$(destinationInput).on("input", function () {
   search.apply(this, [destinationList, destinationInput, destinations_data]);
 });
 
 // Add an event listener to the nationality input
-nationalityInput.addEventListener("input", async function (e) {
+$(nationalityInput).on("input", async function (e) {
   e.preventDefault();
 
-  if (!nationalities) {
-    const Countries = await fetchCountries();
-    nationalities = Countries.map((country) => ({
-      label: `${country.flag} ${country.demonyms?.eng.m}`,
-      value: country.demonyms?.eng.m,
-    }));
+  if (!has_fetched_countries) {
+    await fetchCountries();
   }
 
   search.apply(this, [
@@ -207,55 +211,50 @@ nationalityInput.addEventListener("input", async function (e) {
 });
 
 // Add an event listener to the country input
-countryInput.addEventListener("input", async function (e) {
+$(countryInput).on("input", async function (e) {
   e.preventDefault();
-
-  if (!nationalities) {
-    const Countries = await fetchCountries();
-    nationalities = Countries.map((country) => ({
-      label: `${country.flag} ${country.name.common}`,
-      value: country.name.common,
-    }));
+  if (!has_fetched_countries) {
+    await fetchCountries();
   }
 
-  search.apply(this, [countryList, countryInput, nationalities, "flag"]);
+  search.apply(this, [countryList, countryInput, countries, "flag"]);
 });
 
 // Add an event listener to the city input
-cityInput.addEventListener("input", function () {
+$(cityInput).on("input", function () {
   search.apply(this, [cityList, cityInput, destinations_data]);
 });
+// Submit the form
+const form = $("#search-form");
 
-////// Submit the form
-document
-  .getElementById("search-form")
-  .addEventListener("submit", function (event) {
-    event.preventDefault();
-    const destination = document.getElementById("destination").value;
-    const checkIn = document.getElementById("check-in-date").value;
-    const checkOut = document.getElementById("check-out-date").value;
-    const nights = parseInt(document.getElementById("nights").value);
-    const currency = document.getElementById("currency").value;
-    const city = document.getElementById("city").value;
-    let country = document.getElementById("country").value;
-    let nationality = document.getElementById("nationality").value;
+$(form).on("submit", function (event) {
+  event.preventDefault();
 
-    // remove the flag
-    nationality = nationality.substring(nationality.indexOf(" ") + 1);
-    country = country.substring(country.indexOf(" ") + 1);
+  const destination = $("#destination").val();
+  const checkIn = $("#check-in-date").val();
+  const checkOut = $("#check-out-date").val();
+  const nights = parseInt($("#nights").val());
+  const currency = $("#currency").val();
+  const city = $("#city").val();
+  let country = $("#country").val();
+  let nationality = $("#nationality").val();
 
-    const data = {
-      destination,
-      checkIn,
-      checkOut,
-      nights,
-      nationality,
-      currency,
-      country,
-      city,
-    };
+  // remove the flag
+  nationality = nationality.substring(nationality.indexOf(" ") + 1);
+  country = country.substring(country.indexOf(" ") + 1);
 
-    console.table(data);
+  const data = {
+    destination,
+    checkIn,
+    checkOut,
+    nights,
+    nationality,
+    currency,
+    country,
+    city,
+  };
 
-    alert("Check the console to see the data");
-  });
+  console.table(data);
+
+  alert("Check the console to see the data");
+});
